@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Presentation-Tool: Controller</title>
+    <link rel="stylesheet" href="css/controller.css" />
+    <script src="./socket.io/socket.io.js"></script>
+    <script src="./js/jquery-3.6.1.slim.min.js"></script>
+    <script>
+      $(function () {
+        var socket = io();
+
+        socket.on("slideStatus", (msg) => {
+          if (!msg.side || !(msg.side === "left" || msg.side === "right")) {
+            return false;
+          }
+          let msgArea;
+          if (msg.side === "left") {
+            msgArea = $("#messages_left");
+          } else if (msg.side === "right") {
+            msgArea = $("#messages_right");
+          }
+          if (msgArea.children().length > 5) {
+            msgArea.children().first().next("li").remove();
+          }
+          msgArea.append($("<li>").text(msg.code));
+        });
+
+        $("form").submit((e) => {
+          e.preventDefault();
+          const msgSelector = $("#m");
+          socket.emit("slideCommand", msgSelector.val());
+          msgSelector.val("");
+          return false;
+        });
+
+        $("ul").click((e) => {
+          let targetEle = $(e.target);
+          if (targetEle.is("small")) {
+            targetEle = targetEle.parent();
+          }
+          if (targetEle.attr("id")) {
+            $("li").removeClass("active next");
+            targetEle.addClass("active visited");
+            let nextEle = targetEle.next("li");
+            if (!nextEle.attr("id")) {
+              if (nextEle.children().length > 0) {
+                // Subordinate element
+                nextEle = targetEle.next("li").children().children().first();
+              } else if (
+                targetEle.parent().parent().next("li") &&
+                targetEle.parent().parent().next("li").attr("id")
+              ) {
+                // Last subordinate element
+                nextEle = targetEle.parent().parent().next("li");
+              }
+            }
+            nextEle.addClass("next");
+            console.log("Emit: ", targetEle.attr("id"));
+            socket.emit("slideCommand", targetEle.attr("id"));
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <section class="top">
+      <section id="log">
+        <ul id="messages_left">
+          <small>Left</small>
+        </ul>
+        <ul id="messages_right">
+          <small>Right</small>
+        </ul>
+      </section>
+      <section class="fast">
+        <ul>
+          <li id="logo">Jump to logo</li>
+          <li id="black">Toggle black</li>
+        </ul>
+      </section>
+    </section>
+    <section class="actions">
+      <form><input id="m" /></form>
+      <ul id="list">
+        <li id="start">## START ##</li>
+        <li id="1">01 ABC</li>
+        <li id="2">02 DEF</li>
+        <li id="3">03 GEH</li>
+        <li id="pause">## PAUSE ##</li>
+        <li id="5">05 XYZ</li>
+        <li>
+          <ul>
+            <li id="5b">> XYZ 2</li>
+            <li id="5c">> XYZ 3</li>
+          </ul>
+        </li>
+        <li id="6">06 123</li>
+        <li id="encore">## ENCORE ##</li>
+        <li id="end">## END ##</li>
+      </ul>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+body,
+ul {
+  margin: 0;
+  padding: 0;
+}
+section {
+  margin: 2rem auto;
+  max-width: 1200px;
+  width: 85%;
+}
+.notes {
+  overflow-x: auto;
+}
+.warning {
+  padding: 1rem;
+  border: 5px solid darkorange;
+  margin-bottom: 1rem;
+}
+ul {
+  display: flex;
+  justify-content: stretch;
+  list-style: none;
+  flex-wrap: wrap;
+}
+ul li {
+  flex: 1 1 0;
+  min-width: 200px;
+  width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+a {
+  font-size: xx-large;
+  font-weight: bold;
+}

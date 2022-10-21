@@ -1,0 +1,44 @@
+body {
+  display: flex;
+  flex-direction: column;
+}
+.top {
+  display: flex;
+}
+#log {
+  display: flex;
+  height: 150px;
+}
+.actions {
+  height: 60vh;
+  overflow-y: scroll;
+  padding-right: 5rem;
+}
+input {
+  width: calc(100% - 8px - 0.25rem);
+  padding: 0.25rem;
+}
+ul {
+  list-style: none;
+}
+li > ul {
+  margin: -2rem;
+  padding-left: 1rem;
+}
+#list {
+  margin: 0;
+  padding: 0;
+}
+#list li {
+  border: 1px solid gray;
+  padding: 2rem;
+}
+.visited {
+  background-color: darkgrey;
+}
+.active {
+  background-color: mediumseagreen;
+}
+.next {
+  background-color: goldenrod;
+}
