@@ -1,8 +1,8 @@
 # Presentation-Tool
-This repository contains a small and dirty tool that allows you to remotely control two [reveal.js](https://revealjs.com) presentations at the same time.
-It is written in [Express](https://expressjs.com), [Socket.IO](https://socket.io) and [jQuery](https://jquery.com).
+This repository contains a quick and dirty solution to remotely control two [reveal.js](https://revealjs.com) presentations at the same time.
+It is written with [Express](https://expressjs.com), [Socket.IO](https://socket.io) and [jQuery](https://jquery.com).
 
-The presentations and all assets must be located in the slides folder.
+The presentations and all assets must be located in the slides folder which is exported.
 
 ## Prerequisites
 * yarn
