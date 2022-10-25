@@ -39,7 +39,7 @@
           return false;
         });
 
-        $("ul").click((e) => {
+        $("ul#list").click((e) => {
           let targetEle = $(e.target);
           if (targetEle.is("small")) {
             targetEle = targetEle.parent();
