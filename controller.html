@@ -72,6 +72,14 @@
             socket.emit("slideCommand", targetEle.attr("id"));
           }
         });
+
+        $("body").keydown((e) => {
+          if(e.key === "PageDown") {
+            socket.emit("slideCommand", "next");
+          } else if(e.key === "PageUp") {
+            socket.emit("slideCommand", "prev");
+          }
+        })
       });
     </script>
   </head>
