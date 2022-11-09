@@ -3,11 +3,11 @@ const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
 
-const ipAddress = "192.168.178.42";
+const hostname = "0.0.0.0";
 const port = 8080;
 
-http.listen(port, ipAddress, () => {
-  console.log(`Started on ${ipAddress}:${port}`);
+http.listen(port, hostname, () => {
+  console.log(`Server running at https://${hostname}:${port}/`);
 });
 
 app.get("/", (req, res) => {
@@ -28,10 +28,11 @@ app.get("/controller", (req, res) => {
 app.use(express.static("slides"));
 
 io.on("connection", (socket) => {
-  console.log(`Client ${socket.conn.remoteAddress} joined`);
+  console.log(`Client ${socket.handshake.headers.host} joined`);
+  console.log(socket.handshake.headers);
   io.emit("clientJoin", { for: "everyone" });
   socket.on("disconnect", () => {
-    console.log(`Client ${socket.conn.remoteAddress} left`);
+    console.log(`Client ${socket.handshake.headers.host} left`);
     io.emit("clientLeave", { for: "everyone" });
   });
 
