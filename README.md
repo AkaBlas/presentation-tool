@@ -11,4 +11,5 @@ The presentations and all assets must be located in the slides folder which is e
 ## Getting started
 1. Run `yarn install`
 2. Configure IP address and port in `server.js`
-3. Start via `yarn serve`
+3. Customize basic auth in `auth.js` according to your needs
+4. Start server via `yarn serve`

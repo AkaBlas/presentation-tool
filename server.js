@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
+const auth = require("./auth");
 
 const hostname = "0.0.0.0";
 const port = 8080;
@@ -9,6 +10,8 @@ const port = 8080;
 http.listen(port, hostname, () => {
   console.log(`Server running at https://${hostname}:${port}/`);
 });
+
+app.use(auth);
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/app.html");
