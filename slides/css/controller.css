@@ -9,6 +9,9 @@ body {
   display: flex;
   height: 150px;
 }
+#log ul {
+  width: 60px;
+}
 .actions {
   height: 60vh;
   overflow-y: scroll;
