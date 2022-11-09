@@ -22,9 +22,6 @@ Desktop DF
 # idea files
 *.iml
 .idea
-# ui
-scm-ui/build
-scm-ui/coverage
 node_modules
 .fuse_hidden*
 .directory
@@ -171,3 +168,4 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node,linux,intellij
+slides/assets/
