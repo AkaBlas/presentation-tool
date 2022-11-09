@@ -34,6 +34,7 @@ const controlSlide = (side) => {
         "pause",
         "encore",
         "end",
+        "play",
       ];
 
       if (allowed.includes(msg)) {
@@ -60,6 +61,9 @@ const controlSlide = (side) => {
           case "end":
             Reveal.slide(8); // Customize here
             break;
+          case "play":
+            const video = $("video");
+            video.trigger(video.prop("paused") ? "play" : "pause");
         }
         socket.emit("slideStatus", { side, code: msg });
       }
