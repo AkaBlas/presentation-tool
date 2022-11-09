@@ -8,7 +8,7 @@ const hostname = "0.0.0.0";
 const port = 8080;
 
 http.listen(port, hostname, () => {
-  console.log(`Server running at https://${hostname}:${port}/`);
+  console.log(`Server running at http://${hostname}:${port}/`);
 });
 
 app.use(auth);
