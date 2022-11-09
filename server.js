@@ -30,6 +30,10 @@ app.get("/controller", (req, res) => {
 
 app.use(express.static("slides"));
 
+app.use((req, res) => {
+  res.sendStatus(404);
+});
+
 io.on("connection", (socket) => {
   console.log(`Client ${socket.handshake.headers.host} joined`);
   console.log(socket.handshake.headers);
