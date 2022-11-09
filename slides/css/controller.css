@@ -33,6 +33,14 @@ li > ul {
   border: 1px solid gray;
   padding: 2rem;
 }
+#fast-list {
+	margin: 0;
+	margin-bottom: 1rem;
+}
+#fast-list li {
+  border: 1px solid gray;
+  padding: 0.5rem 1rem;
+}
 .visited {
   background-color: darkgrey;
 }

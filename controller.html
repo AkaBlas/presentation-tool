@@ -65,6 +65,13 @@
             socket.emit("slideCommand", targetEle.attr("id"));
           }
         });
+
+        $("ul#fast-list").click((e) => {
+          let targetEle = $(e.target);
+          if (targetEle.attr("id")) {
+            socket.emit("slideCommand", targetEle.attr("id"));
+          }
+        });
       });
     </script>
   </head>
@@ -79,9 +86,12 @@
         </ul>
       </section>
       <section class="fast">
-        <ul>
-          <li id="logo">Jump to logo</li>
-          <li id="black">Toggle black</li>
+        <ul id="fast-list">
+          <li id="logo">Display logo</li>
+          <li id="schwarz">Toggle black</li>
+          <li id="play">Toggle video</li>
+          <li id="prev">Previous</li>
+          <li id="next">Next</li>
         </ul>
       </section>
     </section>
