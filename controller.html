@@ -45,8 +45,8 @@
             targetEle = targetEle.parent();
           }
           if (targetEle.attr("id")) {
-            $("li").removeClass("active next");
-            targetEle.addClass("active visited");
+            $("li").removeClass("ac-active ac-next");
+            targetEle.addClass("ac-active ac-visited");
             let nextEle = targetEle.next("li");
             if (!nextEle.attr("id")) {
               if (nextEle.children().length > 0) {
@@ -60,13 +60,20 @@
                 nextEle = targetEle.parent().parent().next("li");
               }
             }
-            nextEle.addClass("next");
+            nextEle.addClass("ac-next");
             console.log("Emit: ", targetEle.attr("id"));
             socket.emit("slideCommand", targetEle.attr("id"));
           }
         });
 
         $("ul#fast-list").click((e) => {
+          let targetEle = $(e.target);
+          if (targetEle.attr("id")) {
+            socket.emit("slideCommand", targetEle.attr("id"));
+          }
+        });
+
+        $("#gr").click((e) => {
           let targetEle = $(e.target);
           if (targetEle.attr("id")) {
             socket.emit("slideCommand", targetEle.attr("id"));
@@ -84,7 +91,26 @@
     </script>
   </head>
   <body>
-    <section class="top">
+    <div class="grid" id="gr">
+      <div class="control special">
+        <div id="play">
+          <ion-icon name="videocam-sharp" aria-hidden="true"></ion-icon>
+        </div>
+
+      </div>
+      <div class="control prev" id="prev">
+        <ion-icon name="arrow-back-sharp" aria-label="Previous"></ion-icon>
+      </div>
+      <div class="control next" id="next">
+        <ion-icon name="arrow-forward-sharp" aria-label="Next"></ion-icon>
+      </div>
+      <div class="control start" id="start">
+        <ion-icon name="home-sharp" aria-label="Back to Start"></ion-icon>
+      </div>
+      <div class="control black" id="black">
+        <ion-icon name="contrast-sharp" aria-label="Toggle black"></ion-icon>
+      </div>
+
       <section id="log">
         <ul id="messages_left">
           <small>Left</small>
@@ -93,35 +119,30 @@
           <small>Right</small>
         </ul>
       </section>
-      <section class="fast">
-        <ul id="fast-list">
-          <li id="logo">Display logo</li>
-          <li id="black">Toggle black</li>
-          <li id="play">Toggle video</li>
-          <li id="prev">Previous</li>
-          <li id="next">Next</li>
+
+      <section class="actions">
+        <form><input id="m" /></form>
+        <ul id="list">
+          <li id="start">## START ##</li>
+          <li id="1">01 ABC</li>
+          <li id="2">02 DEF</li>
+          <li id="3">03 GEH</li>
+          <li id="pause">## PAUSE ##</li>
+          <li id="5">05 XYZ</li>
+          <li>
+            <ul>
+              <li id="5b">> XYZ 2</li>
+              <li id="5c">> XYZ 3</li>
+            </ul>
+          </li>
+          <li id="6">06 123</li>
+          <li id="encore">## ENCORE ##</li>
+          <li id="end">## END ##</li>
         </ul>
       </section>
-    </section>
-    <section class="actions">
-      <form><input id="m" /></form>
-      <ul id="list">
-        <li id="start">## START ##</li>
-        <li id="1">01 ABC</li>
-        <li id="2">02 DEF</li>
-        <li id="3">03 GEH</li>
-        <li id="pause">## PAUSE ##</li>
-        <li id="5">05 XYZ</li>
-        <li>
-          <ul>
-            <li id="5b">> XYZ 2</li>
-            <li id="5c">> XYZ 3</li>
-          </ul>
-        </li>
-        <li id="6">06 123</li>
-        <li id="encore">## ENCORE ##</li>
-        <li id="end">## END ##</li>
-      </ul>
-    </section>
+
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   </body>
 </html>
