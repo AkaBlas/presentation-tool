@@ -1,6 +1,8 @@
 body {
   display: flex;
   flex-direction: column;
+  color: #B8B9B6;
+  background: #2B2B2B;
 }
 .grid {
   display: grid;
@@ -11,7 +13,8 @@ body {
   height: 90vh;
 }
 .control {
-  border: 1px solid gray;
+  background: #323232;
+  border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -39,6 +42,7 @@ body {
 ion-icon {
   width: 32px;
   height: 32px;
+  color: #B8B9B6;
   pointer-events: none;
 }
 #log {
