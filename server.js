@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
@@ -28,6 +29,23 @@ app.get("/controller", (req, res) => {
   res.sendFile(__dirname + "/controller.html");
 });
 
+app.use(
+  "/vendor/jquery",
+  express.static(path.join(__dirname, "node_modules/jquery/dist")),
+);
+app.use(
+  "/vendor/reveal",
+  express.static(path.join(__dirname, "node_modules/reveal.js/dist")),
+);
+app.use(
+  "/vendor/socket.io",
+  express.static(path.join(__dirname, "node_modules/socket.io/client-dist")),
+);
+app.use(
+  "/vendor/ionicons",
+  express.static(path.join(__dirname, "node_modules/ionicons/dist/ionicons")),
+);
+app.use("/assets", express.static("slides/img"));
 app.use(express.static("slides"));
 
 app.use((req, res) => {
