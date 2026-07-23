@@ -61,9 +61,7 @@
         });
 
         $("#gr").click((e) => {
-          const command = $(e.target)
-            .closest("button[data-command]")
-            .data("command");
+          const command = $(e.target).closest("button[data-command]").data("command");
           emitCommand(command);
         });
 
@@ -127,9 +125,7 @@
             <td colspan="4" data-command="pause">## PAUSE ##</td>
           </tr>
           <tr>
-            <td colspan="4" data-command="xyz">
-              XYZ
-            </td>
+            <td colspan="4" data-command="xyz">XYZ</td>
           </tr>
           <tr>
             <td data-command="xyz-b">

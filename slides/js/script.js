@@ -12,8 +12,8 @@ const parseSlideTarget = (command) => {
 };
 
 const goToNamedSlide = (name) => {
-  const slide = Array.from(document.querySelectorAll("[data-slide]")).find(
-    (slide) => slide.dataset.slide.split(/\s+/).includes(name),
+  const slide = Array.from(document.querySelectorAll("[data-slide]")).find((slide) =>
+    slide.dataset.slide.split(/\s+/).includes(name),
   );
 
   if (!slide) {

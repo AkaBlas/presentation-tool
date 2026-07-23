@@ -29,14 +29,8 @@ app.get("/controller", (req, res) => {
   res.sendFile(__dirname + "/controller.html");
 });
 
-app.use(
-  "/vendor/jquery",
-  express.static(path.join(__dirname, "node_modules/jquery/dist")),
-);
-app.use(
-  "/vendor/reveal",
-  express.static(path.join(__dirname, "node_modules/reveal.js/dist")),
-);
+app.use("/vendor/jquery", express.static(path.join(__dirname, "node_modules/jquery/dist")));
+app.use("/vendor/reveal", express.static(path.join(__dirname, "node_modules/reveal.js/dist")));
 app.use(
   "/vendor/socket.io",
   express.static(path.join(__dirname, "node_modules/socket.io/client-dist")),
