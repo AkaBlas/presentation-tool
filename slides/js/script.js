@@ -1,72 +1,67 @@
+const parseSlideTarget = (command) => {
+  const match = command.match(/^(\d+)([a-z])?$/);
+  if (!match) {
+    return null;
+  }
+
+  const [, horizontal, vertical = "a"] = match;
+  return {
+    horizontal: Number(horizontal),
+    vertical: vertical.charCodeAt(0) - "a".charCodeAt(0),
+  };
+};
+
+const goToNamedSlide = (name) => {
+  const slide = Array.from(document.querySelectorAll("[data-slide]")).find(
+    (slide) => slide.dataset.slide.split(/\s+/).includes(name),
+  );
+
+  if (!slide) {
+    return false;
+  }
+
+  const { h, v = 0, f } = Reveal.getIndices(slide);
+  Reveal.slide(h, v, f);
+  return true;
+};
+
 const controlSlide = (side) => {
   const socket = io();
 
   socket.on("slideCommand", (msg) => {
-    if (/^([0-9]+[a-g]?)$/.test(msg)) {
-      let xPage = msg;
-      let vPage = 0;
-      if (/([a-g]+)$/.test(msg)) {
-        xPage = msg.slice(0, -1);
-        if (msg.endsWith("b")) {
-          vPage = 1;
-        } else if (msg.endsWith("c")) {
-          vPage = 2;
-        } else if (msg.endsWith("d")) {
-          vPage = 3;
-        } else if (msg.endsWith("e")) {
-          vPage = 4;
-        } else if (msg.endsWith("f")) {
-          vPage = 5;
-        } else if (msg.endsWith("g")) {
-          vPage = 6;
-        }
-      }
-      console.log("page: ", xPage, vPage);
-      Reveal.slide(xPage, vPage);
-      socket.emit("slideStatus", { side, code: msg });
-    } else {
-      const allowed = [
-        "prev",
-        "next",
-        "black",
-        "logo",
-        "start",
-        "pause",
-        "encore",
-        "end",
-        "play",
-      ];
+    const command = String(msg).trim();
+    const target = parseSlideTarget(command);
 
-      if (allowed.includes(msg)) {
-        switch (msg) {
-          case "prev":
-            Reveal.prev();
-            break;
-          case "next":
-            Reveal.next();
-            break;
-          case "black":
-            Reveal.togglePause();
-            break;
-          case "start":
-          case "logo":
-            Reveal.slide(0);
-            break;
-          case "pause":
-            Reveal.slide(4); // Customize here
-            break;
-          case "encore":
-            Reveal.slide(7); // Customize here
-            break;
-          case "end":
-            Reveal.slide(8); // Customize here
-            break;
-          case "play":
-            const video = $("video");
-            video.trigger(video.prop("paused") ? "play" : "pause");
-        }
-        socket.emit("slideStatus", { side, code: msg });
-      }
+    if (target) {
+      console.log("page: ", target.horizontal, target.vertical);
+      Reveal.slide(target.horizontal, target.vertical);
+      socket.emit("slideStatus", { side, code: command });
+      return;
+    }
+
+    if (goToNamedSlide(command)) {
+      socket.emit("slideStatus", { side, code: command });
+      return;
+    }
+
+    const commands = {
+      prev: () => Reveal.prev(),
+      next: () => Reveal.next(),
+      black: () => Reveal.togglePause(),
+      logo: () => Reveal.slide(0),
+      play: () => {
+        const video = $("video");
+        video.trigger(video.prop("paused") ? "play" : "pause");
+      },
+      iframe: () => {
+        const iframe = document.querySelector("iframe");
+        iframe.src = "http://0.0.0.0:8443/activepoll";
+      },
+    };
+
+    if (commands[command]) {
+      commands[command]();
+      socket.emit("slideStatus", { side, code: command });
     }
   });
 };
