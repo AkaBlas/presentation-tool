@@ -9,6 +9,8 @@
     "url": "https://github.com/akablas/presentation-tool.git"
   },
   "scripts": {
+    "format": "prettier --write \"**/*.{css,html,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{css,html,js,json,md}\"",
     "serve": "node server.js"
   },
   "dependencies": {
