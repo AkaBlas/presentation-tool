@@ -1,8 +1,8 @@
 body {
   display: flex;
   flex-direction: column;
-  color: #B8B9B6;
-  background: #2B2B2B;
+  color: #b8b9b6;
+  background: #2b2b2b;
 }
 button {
   /* reset */
@@ -37,6 +37,8 @@ button {
 .control.special {
   grid-column: 2/5;
   grid-row: 1;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 .control.prev {
   grid-column: 2;
@@ -57,8 +59,9 @@ button {
 ion-icon {
   width: 32px;
   height: 32px;
-  color: #B8B9B6;
+  color: #b8b9b6;
   pointer-events: none;
+  padding: 0.5rem;
 }
 #log {
   grid-column: 1;
@@ -67,13 +70,13 @@ ion-icon {
 }
 #log ul {
   width: 60px;
+  margin: 0;
 }
 .actions {
   grid-column: 1/5;
   grid-row: 4;
   height: 60vh;
   overflow-y: scroll;
-  padding-right: 5rem;
 }
 input {
   width: calc(100% - 8px - 0.25rem);
@@ -82,24 +85,21 @@ input {
 ul {
   list-style: none;
 }
-li > ul {
-  margin: -2rem;
-  padding-left: 1rem;
-}
 #list {
   margin: 0;
   padding: 0;
 }
-#list li {
+table {
+  width: 100%;
+  text-align: center;
+}
+table td {
   border: 1px solid gray;
-  padding: 2rem;
+  padding: 2rem 1rem;
 }
 .ac-visited {
-  background-color: darkgrey;
+  background-color: #535353;
 }
 .ac-active {
-  background-color: mediumseagreen;
-}
-.ac-next {
-  background-color: goldenrod;
+  background-color: #20643e;
 }
