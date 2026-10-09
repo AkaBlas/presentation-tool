@@ -23,8 +23,8 @@ app.get("/", (req, res) => {
 app.get("/show", (req, res) => {
   res.sendFile(__dirname + "/slides/show.html");
 });
-app.get("/show-controller", (req, res) => {
-  res.sendFile(__dirname + "/show-controller.html");
+app.get("/controller", (req, res) => {
+  res.sendFile(__dirname + "/controller.html");
 });
 
 app.use("/vendor/jquery", express.static(path.join(__dirname, "node_modules/jquery/dist")));

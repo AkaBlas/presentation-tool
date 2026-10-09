@@ -20,7 +20,7 @@ exported. Images and videos go into `slides/img` and are referenced as `./assets
 3. Customize basic auth in `auth.js` according to your needs
 4. Start server via `yarn serve`
 
-The committed `slides/show.html` and the cue table in `show-controller.html` are examples to start
+The committed `slides/show.html` and the cue table in `controller.html` are examples to start
 each new show from.
 
 ## Define Slides
@@ -103,7 +103,7 @@ become [vertical slides](https://revealjs.com/vertical-slides/).
 3. Pick one machine as the hub, e.g. `10.0.0.1`. On each output machine open (kiosk/fullscreen):
    - left: `http://localhost:8080/show?view=left&hub=10.0.0.1:8080`
    - right: `http://localhost:8080/show?view=right&hub=10.0.0.1:8080`
-4. Open `http://10.0.0.1:8080/show-controller` on the controlling device.
+4. Open `http://10.0.0.1:8080/controller` on the controlling device.
 
 Both machines always switch together, videos and CSS animations stay in sync. The controller shows
 both outputs with their current slide. A red line means an output is offline, on the wrong slide, or
@@ -111,7 +111,7 @@ running a different version of `show.html` than the other one.
 
 ### Controller
 
-The cue table in `show-controller.html` is the running order: one row per step, cells in one row are
+The cue table in `controller.html` is the running order: one row per step, cells in one row are
 alternatives. The table has 4 columns, use `colspan` to fill a row:
 
 ```html
