@@ -131,11 +131,11 @@ During the show:
 
 - Space / GO fires the next row when it has one cell, 1-9 pick a cell in rows with several
 - Clicking a cell jumps there directly
-- PageDown / PageUp (presenter clickers) or the arrow buttons go to the next / previous slide
-- `b` or `.` and the black button toggle a black screen on both projectors
-- The home and chart buttons jump to the slides named `start` and `results`
-- The pause button pauses / resumes the current video
-- The eye button shows a live preview of the whole canvas
+- PageDown / PageUp (presenter clickers) or Prev / Next go to the previous / next slide
+- `b` or `.` and Black toggle a black screen on both projectors
+- Start and Results jump to the slides named `start` and `results`
+- Video pauses / resumes the current video
+- Poll reloads the poll iframe, Preview shows a live preview of the whole canvas
 - The input field takes any command: a slide name, a slide number like `5` or `5b` (horizontal index
   counting from 0, vertical slide `b`), `next`, `prev`, `down`, `logo` (first slide), `black`,
   `play`
