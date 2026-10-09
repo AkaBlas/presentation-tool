@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>Presentation-Tool: Show</title>
+
+    <link rel="stylesheet" href="/vendor/reveal/reset.css" />
+    <link rel="stylesheet" href="/vendor/reveal/reveal.css" />
+    <link rel="stylesheet" href="css/theme/akablas.css" />
+    <link rel="stylesheet" href="css/show.css" />
+
+    <script src="/vendor/socket.io/socket.io.min.js"></script>
+    <script src="js/show.js"></script>
+  </head>
+  <body>
+    <!--
+      One 3840x1080 canvas: .left = left projector, .right = right projector, .full = across both.
+      Videos are started and kept in sync by js/show.js; data-advance = go down when it ends.
+    -->
+    <div class="reveal">
+      <div class="slides">
+        <section data-slide="start">
+          <!-- ## START ## -->
+          <div class="left"><h2>Start</h2></div>
+        </section>
+        <section data-slide="abc">
+          <!-- 01: one image per projector, e.g. <img class="left" src="./assets/abc_left.jpg" /> -->
+          <div class="left"><h2>ABC left</h2></div>
+          <div class="right"><h2>ABC right</h2></div>
+        </section>
+        <section data-slide="def">
+          <!-- 02: one image across both projectors, e.g. <img class="full" src="./assets/def.jpg" /> -->
+          <div class="full"><h2>DEF across both projectors</h2></div>
+        </section>
+        <section data-slide="geh">
+          <!-- 03: question on the left projector, right one stays empty -->
+          <div class="left">
+            <div class="question"><h2>GEH: question for the audience?</h2></div>
+          </div>
+        </section>
+        <section data-slide="pause">
+          <!-- ## PAUSE ## -->
+          <div class="left"><h2>Pause</h2></div>
+        </section>
+        <section data-slide="xyz">
+          <!-- 05: vertical slides, the cue "xyz" goes to the first one -->
+          <section data-slide="xyz-a">
+            <!-- 05a -->
+            <div class="left"><h2>XYZ a</h2></div>
+          </section>
+          <section data-slide="xyz-b">
+            <!--
+              05b: a video moves on to the next vertical slide when it is over, e.g.
+              <video class="full" data-advance muted preload="auto" src="./assets/xyz.mp4"></video>
+            -->
+            <div class="left"><h2>XYZ b</h2></div>
+          </section>
+          <section data-slide="xyz-c">
+            <!-- 05c -->
+            <div class="left"><h2>XYZ c</h2></div>
+          </section>
+        </section>
+        <section data-slide="123">
+          <!-- 06 -->
+          <div class="left"><h2>123</h2></div>
+        </section>
+        <section data-slide="encore">
+          <!-- ## ENCORE ## -->
+          <div class="left"><h2>Encore</h2></div>
+        </section>
+        <section data-slide="end">
+          <!-- ## END ## -->
+          <div class="left"><h2>End</h2></div>
+        </section>
+        <section data-slide="results">
+          <!-- ## RESULTS ## (controller button) -->
+          <div class="left"><h2>Results</h2></div>
+        </section>
+      </div>
+    </div>
+    <script src="/vendor/reveal/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+        controls: false,
+        progress: false,
+        transition: "fade",
+        width: 3840,
+        height: 1080,
+        margin: 0,
+        minScale: 0.05,
+        center: false,
+        keyboard: false,
+        touch: false,
+        hash: false,
+        autoPlayMedia: false,
+        scrollActivationWidth: 0,
+      }).then(startShow);
+    </script>
+  </body>
+</html>

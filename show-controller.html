@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Presentation-Tool: Show controller</title>
+    <link rel="stylesheet" href="css/controller.css" />
+    <link rel="stylesheet" href="css/show-controller.css" />
+    <script src="/vendor/socket.io/socket.io.min.js"></script>
+    <script src="/vendor/jquery/jquery.slim.min.js"></script>
+    <script>
+      $(function () {
+        const socket = io("/show", { transports: ["websocket"] });
+        // Commands the hub handles itself, so they never need a matching data-slide.
+        const builtins = ["next", "prev", "down", "logo", "black", "play", "iframe"];
+
+        let state = null;
+        let manifest = [];
+        let clients = [];
+
+        $("#list tr").each((row, tr) => {
+          $(tr)
+            .find("td")
+            .each((cell, td) => $(td).attr("data-ref", `${row}.${cell}`));
+        });
+
+        const log = (text, isError) => {
+          const messages = $("#messages");
+          messages.prepend($("<li>").text(text).toggleClass("error", Boolean(isError)));
+          messages.children().slice(6).remove();
+        };
+
+        const emitCue = (command, ref) => {
+          if (!command) {
+            return;
+          }
+          socket.timeout(2000).emit("cue", { command, ref }, (err, response) => {
+            const error = err ? "hub not reachable" : response.error;
+            log(error ? `${command}: ${error}` : command, error);
+          });
+        };
+
+        // Unnamed vertical slides are shown as "<stack name> +<v>"
+        const slideName = (h, v) => {
+          const find = (v) => manifest.find((slide) => slide.h === h && slide.v === v);
+          if (find(v)?.names[0]) {
+            return find(v).names[0];
+          }
+          return find(0)?.names[0] ? `${find(0).names[0]} +${v}` : `${h}/${v}`;
+        };
+
+        // The cue table is a running order: rows in show order, cells in one row are the
+        // alternatives the audience votes between. GO fires the next row when it has one cell;
+        // with several, 1-9 picks one.
+        const activeCell = () => (state?.ref ? $(`#list td[data-ref="${state.ref}"]`) : $());
+        const nextCells = () => {
+          const row = activeCell().closest("tr");
+          return (row.length ? row.next("tr") : $("#list tr").first()).find("td[data-command]");
+        };
+
+        const fire = (cell) => emitCue(cell.attr("data-command"), cell.attr("data-ref"));
+
+        const go = (choice) => {
+          const cells = nextCells();
+          if (choice === undefined && cells.length > 1) {
+            log(`choose 1-${cells.length}`, true);
+            return;
+          }
+          if (cells.eq(choice ?? 0).length) {
+            fire(cells.eq(choice ?? 0));
+          }
+        };
+
+        const renderState = () => {
+          $("#list td").removeClass("ac-active ac-next");
+          activeCell().addClass("ac-active ac-visited");
+          const cells = nextCells().addClass("ac-next");
+
+          $("#now").text(
+            state ? `${slideName(state.h, state.v)}${state.paused ? " (black)" : ""}` : "-",
+          );
+          $("#next-up").text(
+            cells
+              .toArray()
+              .map((td, i) => `${cells.length > 1 ? `${i + 1}: ` : ""}${$(td).text().trim()}`)
+              .join(" | ") || "-",
+          );
+          $("#go").prop("disabled", cells.length !== 1);
+          renderClients();
+        };
+
+        const validate = () => {
+          if (!manifest.length) {
+            return;
+          }
+          const names = new Set(manifest.flatMap((slide) => slide.names));
+          $("[data-command]").each((_, element) => {
+            const command = $(element).attr("data-command");
+            const known =
+              names.has(command) || builtins.includes(command) || /^\d+[a-z]?$/.test(command);
+            $(element)
+              .toggleClass("ac-missing", !known)
+              .attr("title", known ? null : `No slide named "${command}" in show.html`);
+          });
+        };
+
+        const renderClients = () => {
+          const outputs = clients.filter((client) => client.role === "output");
+          const views = ["left", "right", ...outputs.map((client) => client.view)];
+          const rows = [...new Set(views)].flatMap((view) => {
+            const matching = outputs.filter((client) => client.view === view);
+            if (!matching.length) {
+              return view === "left" || view === "right"
+                ? [$("<li>").addClass("offline").text(`${view}: offline`)]
+                : [];
+            }
+            return matching.map(({ report }) => {
+              const settled = report && state && report.seq === state.seq;
+              const wrong = settled && (report.h !== state.h || report.v !== state.v);
+              const where = report ? slideName(report.h, report.v) : "connecting";
+              const rtt = report?.rtt != null ? ` ${report.rtt.toFixed(1)} ms` : "";
+              return $("<li>").toggleClass("error", Boolean(wrong)).text(`${view}: ${where}${rtt}`);
+            });
+          });
+          if (new Set(outputs.map((client) => client.deck)).size > 1) {
+            rows.push($("<li>").addClass("error").text("show.html differs between outputs"));
+          }
+          $("#outputs").empty().append(rows);
+        };
+
+        socket.on("connect", () => {
+          socket.emit("hello", { role: "controller" }, (hello) => {
+            state = hello.state;
+            manifest = hello.manifest;
+            validate();
+            renderState();
+          });
+        });
+        socket.on("disconnect", () => {
+          clients = [];
+          $("#outputs").empty().append($("<li>").addClass("offline").text("hub: offline"));
+        });
+        socket.on("state", (newState) => {
+          state = newState;
+          renderState();
+        });
+        socket.on("manifest", (newManifest) => {
+          manifest = newManifest;
+          validate();
+          renderState();
+        });
+        socket.on("clients", (newClients) => {
+          clients = newClients;
+          renderClients();
+        });
+
+        $("form").submit((e) => {
+          e.preventDefault();
+          const input = $("#m");
+          emitCue(input.val().trim());
+          input.val("");
+        });
+
+        $("#list").click((e) => {
+          const cell = $(e.target).closest("td[data-command]");
+          if (cell.length) {
+            fire(cell);
+          }
+        });
+
+        $("#gr").on("click", "button[data-command]", (e) => {
+          emitCue($(e.currentTarget).attr("data-command"));
+        });
+
+        $("#go").click(() => go());
+
+        $("#preview-toggle").click(() => {
+          const preview = $("#preview");
+          const iframe = preview.find("iframe");
+          preview.prop("hidden", !preview.prop("hidden"));
+          // Unload when hidden: the preview runs the full deck, videos included.
+          iframe.attr(
+            "src",
+            preview.prop("hidden") ? "about:blank" : "show?view=full&role=preview",
+          );
+        });
+
+        // Presenter clickers send PageUp/PageDown, some also "b" or "." for black.
+        $(document).keydown((e) => {
+          if ($(e.target).is("input")) {
+            return;
+          }
+          if (e.key === "PageDown" || e.key === "ArrowRight") {
+            emitCue("next");
+          } else if (e.key === "PageUp" || e.key === "ArrowLeft") {
+            emitCue("prev");
+          } else if (e.key === " ") {
+            e.preventDefault();
+            go();
+          } else if (/^[1-9]$/.test(e.key)) {
+            go(Number(e.key) - 1);
+          } else if (e.key === "b" || e.key === ".") {
+            emitCue("black");
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="grid" id="gr">
+      <div class="control special">
+        <button class="control-button" data-command="black">
+          <ion-icon name="contrast-sharp" aria-label="Toggle black"></ion-icon>
+        </button>
+        <button class="control-button" data-command="play">
+          <ion-icon name="pause-sharp" aria-label="Pause/resume video"></ion-icon>
+        </button>
+        <button class="control-button" data-command="iframe">
+          <ion-icon name="refresh-sharp" aria-label="Reload poll"></ion-icon>
+        </button>
+        <button class="control-button" id="preview-toggle">
+          <ion-icon name="eye-sharp" aria-label="Toggle live preview"></ion-icon>
+        </button>
+      </div>
+      <button class="control prev" data-command="prev">
+        <ion-icon name="arrow-back-sharp" aria-label="Previous"></ion-icon>
+      </button>
+      <button class="control next" data-command="next">
+        <ion-icon name="arrow-forward-sharp" aria-label="Next"></ion-icon>
+      </button>
+      <button class="control start" data-command="start">
+        <ion-icon name="home-sharp" aria-label="Back to Start"></ion-icon>
+      </button>
+      <button class="control black" data-command="results">
+        <ion-icon name="analytics-sharp" aria-label="Open Results"></ion-icon>
+      </button>
+
+      <section id="status">
+        <ul id="outputs">
+          <li class="offline">hub: connecting</li>
+        </ul>
+        <ul id="messages"></ul>
+      </section>
+
+      <section class="actions">
+        <div id="go-bar">
+          <div>
+            <small>Live</small>
+            <div id="now">-</div>
+            <small>Next (Space / 1-9)</small>
+            <div id="next-up">-</div>
+          </div>
+          <button id="go" disabled>GO</button>
+        </div>
+        <div id="preview" hidden><iframe src="about:blank" title="Live preview"></iframe></div>
+
+        <form><input id="m" placeholder="cue name, 12b, next, black ..." /></form>
+
+        <table id="list">
+          <tr>
+            <td colspan="4" data-command="start">## START ##</td>
+          </tr>
+          <tr>
+            <td colspan="2" data-command="abc">ABC</td>
+            <td colspan="2" data-command="def">DEF</td>
+          </tr>
+          <tr>
+            <td colspan="4" data-command="geh">GEH</td>
+          </tr>
+          <tr>
+            <td colspan="4" data-command="pause">## PAUSE ##</td>
+          </tr>
+          <tr>
+            <td colspan="4" data-command="xyz">XYZ</td>
+          </tr>
+          <tr>
+            <td data-command="xyz-b">
+              <small>b. XYZ 2</small>
+            </td>
+            <td data-command="xyz-c">
+              <small>c. XYZ 3</small>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4" data-command="123">123</td>
+          </tr>
+          <tr>
+            <td colspan="4" data-command="encore">## ENCORE ##</td>
+          </tr>
+          <tr>
+            <td colspan="4" data-command="end">## END ##</td>
+          </tr>
+        </table>
+      </section>
+    </div>
+    <script type="module" src="/vendor/ionicons/ionicons.esm.js"></script>
+  </body>
+</html>

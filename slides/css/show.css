@@ -1,0 +1,42 @@
+/*
+ * show.html: one 3840x1080 canvas spanning both projectors. Each output machine renders the whole
+ * deck at twice its window width and shifts it so only its own half is on screen. Reveal sizes the
+ * deck from the .reveal element, so its scaling still works at any projector resolution.
+ * ?view=full (or no view) shows the whole canvas letterboxed, for previews and editing.
+ */
+html[data-view="left"] .reveal,
+html[data-view="right"] .reveal {
+  width: 200%;
+}
+html[data-view="right"] .reveal {
+  left: -100%;
+}
+
+/* center: false + full-height sections, so absolutely positioned halves start at the top */
+.reveal .slides > section,
+.reveal .slides > section > section {
+  height: 100%;
+}
+
+/* Content placement on the canvas: .left / .right = one projector, .full = across both */
+.reveal .left,
+.reveal .right,
+.reveal .full {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+}
+.reveal .right {
+  left: 1920px;
+}
+.reveal .full {
+  width: 3840px;
+}
+.reveal div:is(.left, .right, .full) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
