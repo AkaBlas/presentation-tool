@@ -1,10 +1,12 @@
 # Presentation-Tool
 
-This repository contains a quick and dirty solution to remotely control two
-[Reveal.js](https://revealjs.com) presentations at the same time. It is written with
-[Express](https://expressjs.com), [Socket.IO](https://socket.io) and [jQuery](https://jquery.com).
+This repository contains a quick and dirty solution to show one [Reveal.js](https://revealjs.com)
+presentation across two projectors side by side, each driven by its own machine, and to control both
+remotely. It is written with [Express](https://expressjs.com), [Socket.IO](https://socket.io) and
+[jQuery](https://jquery.com).
 
-The presentations and all assets must be located in the slides folder which is exported.
+The presentation (`slides/show.html`) and all assets must be located in the slides folder which is
+exported. Images and videos go into `slides/img` and are referenced as `./assets/...`.
 
 ## Prerequisites
 
@@ -18,22 +20,33 @@ The presentations and all assets must be located in the slides folder which is e
 3. Customize basic auth in `auth.js` according to your needs
 4. Start server via `yarn serve`
 
+The committed `slides/show.html` and the cue table in `show-controller.html` are examples to start
+each new show from.
+
 ## Define Slides
 
 This guide describes the basics for images, videos, text, and vertical slides in our presentation
 setup. For advanced options and features refer to the
 [official Reveal.js Documentation](https://revealjs.com/).
 
-Each **slide** is represented by a `<section>` element. Inside a slide, you can include **images**,
-**videos**, **text blocks**, or even **nested sections** for vertical navigation.
+The presentation is one 3840x1080 canvas: the left half is shown on the left projector, the right
+half on the right one. Each **slide** is a `<section data-slide="...">` element; the controller
+jumps to it by that name (several names separated by spaces are allowed). Inside a slide, place
+content with:
+
+- `.left`: left projector (1920x1080)
+- `.right`: right projector (1920x1080)
+- `.full`: across both projectors (3840x1080)
 
 ### Images
 
-You can add images directly inside a slide:
-
 ```html
-<section>
-  <img src="./assets/image.jpg" />
+<section data-slide="abc">
+  <img class="left" src="./assets/abc_left.jpg" />
+  <img class="right" src="./assets/abc_right.jpg" />
+</section>
+<section data-slide="panorama">
+  <img class="full" src="./assets/panorama_3840x1080.jpg" />
 </section>
 ```
 
@@ -45,80 +58,84 @@ Videos can be embedded using the
 [`<video>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video) element:
 
 ```html
-<section>
-  <video id="videoname" data-autoplay muted="muted" src="./assets/video.mp4"></video>
+<section data-slide="xyz">
+  <video class="left" data-advance muted preload="auto" src="./assets/video.mp4"></video>
 </section>
 ```
 
-Important options:
+Videos need no `id`, script or `data-autoplay`: they start when the slide is shown and are kept in
+sync on both machines. Important options:
 
-- `id`: Unique identifier for the video to control it via javascript
 - `muted`: Ensures the video starts without sound
-- `data-autoplay`: Automatically starts playback when the slide becomes visible
-- `loop`: Restarts playback when the video ends.
-- `data-preload`: Controls loading behavior (auto, metadata, none).
+- `preload="auto"`: Loads the video in advance, so it starts without delay
+- `data-advance`: Moves on to the next vertical slide when the video is over
+- `loop`: Restarts playback when the video ends
 
 ### Text Blocks
 
-You can include text content using standard HTML elements:
+You can include text content using standard HTML elements. `.left`, `.right` and `.full` blocks
+center their content:
 
 ```html
-<section>
-  <div class="text">
-    <h2>Example</h2>
+<section data-slide="text-1">
+  <div class="left">
+    <div class="text"><h2>Example</h2></div>
   </div>
 </section>
 ```
 
 Text content can be combined with images or videos on the same slide. Any valid HTML is supported:
-headings, paragraphs, lists, etc. `.text` is defined by us and ensures large, centered content.
-There are also other helper classes such as [`r-fit-text`](https://revealjs.com/layout/#fit-text).
+headings, paragraphs, lists, etc. `.text` is defined by us and makes text large and centered. There
+are other helper classes such as [`r-fit-text`](https://revealjs.com/layout/#fit-text).
 
 ### Vertical Slides
 
 Reveal.js supports nested sections. If you place multiple `<section>` elements inside another, they
 become [vertical slides](https://revealjs.com/vertical-slides/).
 
-## Two-machine show
-
-`/show` is one deck for both projectors: a single 3840x1080 canvas, left half on the left projector,
-right half on the right one. Both machines always switch together, videos and CSS animations stay in
-sync.
+## Running the show
 
 ### Setup
 
 1. Connect both output machines (and ideally the controller) via cable to one switch.
-2. Copy the repo to both machines and run `yarn install && yarn serve` on each.
+2. Copy the repo including `slides/img` to both machines and run `yarn install && yarn serve` on
+   each.
 3. Pick one machine as the hub, e.g. `10.0.0.1`. On each output machine open (kiosk/fullscreen):
    - left: `http://localhost:8080/show?view=left&hub=10.0.0.1:8080`
    - right: `http://localhost:8080/show?view=right&hub=10.0.0.1:8080`
 4. Open `http://10.0.0.1:8080/show-controller` on the controlling device.
 
-The controller shows both outputs with their current slide. A red line means an output is offline,
-on the wrong slide, or running a different version of `show.html` than the other one.
+Both machines always switch together, videos and CSS animations stay in sync. The controller shows
+both outputs with their current slide. A red line means an output is offline, on the wrong slide, or
+running a different version of `show.html` than the other one.
 
-### Placing content
+### Controller
 
-Every slide is a `<section data-slide="...">` like before; inside it, place content with:
-
-```html
-<section data-slide="abc">
-  <img class="left" src="./assets/abc_left.jpg" />
-  <img class="right" src="./assets/abc_right.jpg" />
-</section>
-<section data-slide="panorama">
-  <img class="full" src="./assets/panorama_3840x1080.jpg" />
-</section>
-<section data-slide="question-1">
-  <div class="left">
-    <div class="question"><h2>...</h2></div>
-  </div>
-</section>
-```
-
-Videos need no `id`, script or `data-autoplay`; they start when the slide is shown. `data-advance`
-moves on to the next vertical slide when the video is over:
+The cue table in `show-controller.html` is the running order: one row per step, cells in one row are
+alternatives. The table has 4 columns, use `colspan` to fill a row:
 
 ```html
-<video class="left" data-advance muted preload="auto" src="./assets/video.mp4"></video>
+<tr>
+  <td colspan="4" data-command="start">## START ##</td>
+</tr>
+<tr>
+  <td colspan="2" data-command="abc">ABC</td>
+  <td colspan="2" data-command="def">DEF</td>
+</tr>
 ```
+
+`data-command` is the `data-slide` name to jump to. Cues without a matching slide in `show.html` are
+struck through, so typos show up before the show.
+
+During the show:
+
+- Space / GO fires the next row when it has one cell, 1-9 pick a cell in rows with several
+- Clicking a cell jumps there directly
+- PageDown / PageUp (presenter clickers) or the arrow buttons go to the next / previous slide
+- `b` or `.` and the black button toggle a black screen on both projectors
+- The home and chart buttons jump to the slides named `start` and `results`
+- The pause button pauses / resumes the current video
+- The eye button shows a live preview of the whole canvas
+- The input field takes any command: a slide name, a slide number like `5` or `5b` (horizontal index
+  counting from 0, vertical slide `b`), `next`, `prev`, `down`, `logo` (first slide), `black`,
+  `play`

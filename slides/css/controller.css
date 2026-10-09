@@ -63,15 +63,6 @@ ion-icon {
   pointer-events: none;
   padding: 0.5rem;
 }
-#log {
-  grid-column: 1;
-  grid-row: 1/4;
-  display: flex;
-}
-#log ul {
-  width: 60px;
-  margin: 0;
-}
 .actions {
   grid-column: 1/5;
   grid-row: 4;
