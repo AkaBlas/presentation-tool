@@ -28,6 +28,10 @@ small,
   color: #8a8b88;
   font-size: 0.85rem;
 }
+#messages {
+  height: 1.4em;
+  overflow: hidden;
+}
 ul {
   display: flex;
   flex-wrap: wrap;

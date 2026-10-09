@@ -30,6 +30,7 @@
           const messages = $("#messages");
           messages.prepend($("<li>").text(text).toggleClass("error", Boolean(isError)));
           messages.children().slice(6).remove();
+          messages.children().each((i, li) => $(li).css("opacity", 1 - i / 6));
         };
 
         const emitCue = (command, ref) => {
